@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace Jour.Webhooks.Controllers
 {
@@ -13,9 +16,28 @@ namespace Jour.Webhooks.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update()
+        public async Task<IActionResult> Update([FromBody] Update update)
         {
-            return Ok(new {Ok = true});
+            if (update.Type != UpdateType.Message)
+            {
+                await Task.Yield();
+                return Ok();
+            }
+
+            var message = update.Message;
+
+            switch (message.Type)
+            {
+                case MessageType.Text:
+                    // Echo each Message
+                    break;
+
+                case MessageType.Photo:
+                    // Download Photo
+                    break;
+            }
+
+            return Ok();
         }
     }
 }
