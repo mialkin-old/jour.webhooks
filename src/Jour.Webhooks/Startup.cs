@@ -1,3 +1,6 @@
+#nullable enable
+using System;
+using Jour.Webhooks.Telegram;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +19,6 @@ namespace Jour.Webhooks
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -24,9 +26,10 @@ namespace Jour.Webhooks
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Jour.Webhooks", Version = "v1"});
             });
+
+            TelegramHelper.AddTelegramTransformer(services);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -36,11 +39,19 @@ namespace Jour.Webhooks
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Jour.Webhooks v1"));
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(name: "telegram", pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                string pattern = $"{{{TelegramHelper.Name}}}/{{controller}}/{{key}}";
+                endpoints.MapDynamicControllerRoute<TelegramTransformer>(pattern);
+            });
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

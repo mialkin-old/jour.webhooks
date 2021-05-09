@@ -11,5 +11,11 @@ namespace Jour.Webhooks.Controllers
         {
             return Ok(new {ok = true});
         }
+
+        [HttpPost]
+        public IActionResult Update()
+        {
+            return Ok(new {Ok = true});
+        }
     }
 }
