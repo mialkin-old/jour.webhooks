@@ -12,7 +12,7 @@ namespace Jour.Webhooks.Telegram
             Endpoints = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public bool Exists(string? key, string? value)
+        public bool Exists(string key, string? value)
         {
             if (!Endpoints.ContainsKey(key)) return false;
             

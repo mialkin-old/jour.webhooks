@@ -18,9 +18,10 @@ namespace Jour.Webhooks.Controllers
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] Update update)
         {
+            await Task.Yield();
+
             if (update.Type != UpdateType.Message)
             {
-                await Task.Yield();
                 return Ok();
             }
 
