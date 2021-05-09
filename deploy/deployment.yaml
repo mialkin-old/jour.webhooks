@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jour-webhooks
+  namespace: mialkin
+  labels:
+    app: jour-webhooks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jour-webhooks
+  template:
+    metadata:
+      namespace: mialkin
+      labels:
+        app: jour-webhooks
+    spec:
+      containers:
+        - name: jour-webhooks
+          image: gcr.io/helical-patrol-307414/jour.webhooks:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: JOUR_WEBHOOKS_TelegramEndpoints
+              valueFrom:
+                secretKeyRef:
+                  name: jour-webhooks-secrets
+                  key: telegram-endpoints
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jour-webhooks
+  namespace: mialkin
+spec:
+  selector:
+    app: jour-webhooks
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+# Istio virtual service for Istio gateway
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: jour-webhooks
+  namespace: mialkin
+spec:
+  hosts:
+    - "jour.mialkin.ru"
+  gateways:
+    - mialkin-ru-gateway
+  http:
+    - route:
+        - destination:
+            host: jour-webhooks
+            port:
+              number: 80
+      match:
+        - uri:
+            prefix: /telegram

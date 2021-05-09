@@ -26,8 +26,12 @@ namespace Jour.Webhooks
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Jour.Webhooks", Version = "v1"});
             });
+            
+            string? telegramEndpoints = Environment.GetEnvironmentVariable("JOUR_WEBHOOKS_TelegramEndpoints");
+            if (string.IsNullOrEmpty(telegramEndpoints))
+                throw new ArgumentNullException(nameof(telegramEndpoints));
 
-            TelegramHelper.AddTelegramTransformer(services);
+            TelegramHelper.AddTelegramTransformer(services, telegramEndpoints);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

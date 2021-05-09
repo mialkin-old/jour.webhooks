@@ -7,12 +7,8 @@ namespace Jour.Webhooks.Telegram
     {
         public const string Name = "telegram";
 
-        public static void AddTelegramTransformer(IServiceCollection services)
+        public static void AddTelegramTransformer(IServiceCollection services, string telegramEndpoints)
         {
-            string? telegramEndpoints = Environment.GetEnvironmentVariable("JOUR_WEBHOOKS_TelegramEndpoints");
-            if (string.IsNullOrEmpty(telegramEndpoints))
-                throw new ArgumentNullException(nameof(telegramEndpoints));
-
             var endpoints = new TelegramEndpoints();
 
             foreach (string pair in telegramEndpoints.Split(';'))
