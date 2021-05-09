@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -9,12 +11,13 @@ namespace Jour.Webhooks.Controllers
     [Route("[controller]")]
     public class WorkoutController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok(new {ok = true});
-        }
+        private readonly ILogger<WorkoutController> _logger;
 
+        public WorkoutController(ILogger<WorkoutController> logger)
+        {
+            _logger = logger;
+        }
+        
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] Update update)
         {
@@ -25,7 +28,10 @@ namespace Jour.Webhooks.Controllers
                 return Ok();
             }
 
-            var message = update.Message;
+            Message message = update.Message;
+            string json = JsonSerializer.Serialize(message);
+            
+            _logger.LogInformation(json);
 
             switch (message.Type)
             {
