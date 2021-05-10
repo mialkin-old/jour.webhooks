@@ -15,7 +15,7 @@ namespace Jour.Webhooks
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    config.AddEnvironmentVariables(prefix: "JOUR_WEBHOOKS");
+                    config.AddEnvironmentVariables(prefix: "JOUR_WEBHOOKS_");
                 })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }

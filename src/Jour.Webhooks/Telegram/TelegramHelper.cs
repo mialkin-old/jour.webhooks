@@ -7,11 +7,11 @@ namespace Jour.Webhooks.Telegram
     {
         public const string Name = "telegram";
 
-        public static void AddTelegramTransformer(IServiceCollection services, string telegramEndpoints)
+        public static TelegramEndpoints GetTelegramEndpoints(IServiceCollection services, string endpointsString)
         {
             var endpoints = new TelegramEndpoints();
 
-            foreach (string pair in telegramEndpoints.Split(';'))
+            foreach (string pair in endpointsString.Split(';'))
             {
                 string key = pair.Split('=')[0];
                 string value = pair.Split('=')[1];
@@ -19,9 +19,7 @@ namespace Jour.Webhooks.Telegram
                 endpoints.Endpoints.Add(key, value);
             }
 
-            services.AddSingleton(endpoints);
-
-            services.AddSingleton<TelegramTransformer>();
+            return endpoints;
         }
     }
 }

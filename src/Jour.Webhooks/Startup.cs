@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using Jour.Webhooks.Options;
+using Jour.Webhooks.Rabbit;
 using Jour.Webhooks.Telegram;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,7 +19,7 @@ namespace Jour.Webhooks
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -33,7 +35,15 @@ namespace Jour.Webhooks
             if (string.IsNullOrEmpty(telegramEndpoints))
                 throw new ArgumentNullException(nameof(telegramEndpoints));
 
-            TelegramHelper.AddTelegramTransformer(services, telegramEndpoints);
+            TelegramEndpoints endpoints = TelegramHelper.GetTelegramEndpoints(services, telegramEndpoints);
+            services.AddSingleton(endpoints);
+
+            services.AddSingleton<TelegramTransformer>();
+
+            services.AddOptions<RabbitOptions>().Bind(Configuration.GetSection(RabbitOptions.Rabbit))
+                .ValidateDataAnnotations();
+            
+            services.AddTransient<IMessageBroker, RabbitMessageBroker>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
