@@ -21,12 +21,6 @@ namespace Jour.Webhooks.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok();
-        } 
-        
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] Update update)
         {
@@ -42,7 +36,7 @@ namespace Jour.Webhooks.Controllers
             switch (message.Type)
             {
                 case MessageType.Text:
-                    _messageBroker.PublishMessage(queueName: "telegram-workout-received", message.Text);
+                    _messageBroker.PublishMessage(queueName: "telegram-workout-received", message.Text, message.Date);
                     break;
 
                 case MessageType.Photo:

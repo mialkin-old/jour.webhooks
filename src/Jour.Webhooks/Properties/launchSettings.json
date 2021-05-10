@@ -8,9 +8,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "JOUR_WEBHOOKS_TelegramEndpoints": "Workout=1123887049:AAHNPlzrQc9OdkGdm9bKJq5sgpL3md71rvgZs",
-        "JOUR_WEBHOOKS_Rabbit__Hostname": "localhost",
-        "JOUR_WEBHOOKS_Rabbit__Username": "user",
-        "JOUR_WEBHOOKS_Rabbit__Password": "password1234"
+        "JOUR_WEBHOOKS_Rabbit__Hostname": "localhost"
       }
     }
   }

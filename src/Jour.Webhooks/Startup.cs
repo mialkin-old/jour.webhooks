@@ -24,7 +24,7 @@ namespace Jour.Webhooks
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddNewtonsoftJson(); // AddNewtonsoftJson needed for Telegram.Bot's binding to work.
+                .AddNewtonsoftJson(); // AddNewtonsoftJson is needed for Telegram.Bot's bindings to work.
             
             services.AddSwaggerGen(c =>
             {

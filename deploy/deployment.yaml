@@ -27,6 +27,21 @@ spec:
                 secretKeyRef:
                   name: jour-webhooks-secrets
                   key: telegram-endpoints
+            - name: JOUR_WEBHOOKS_Rabbit__Hostname
+              valueFrom:
+                secretKeyRef:
+                  name: jour-webhooks-secrets
+                  key: hostname
+            - name: JOUR_WEBHOOKS_Rabbit__Username
+              valueFrom:
+                secretKeyRef:
+                  name: jour-webhooks-secrets
+                  key: username
+            - name: JOUR_WEBHOOKS_Rabbit__Password
+              valueFrom:
+                secretKeyRef:
+                  name: jour-webhooks-secrets
+                  key: password
 ---
 apiVersion: v1
 kind: Service

@@ -25,12 +25,18 @@ namespace Jour.Webhooks.Rabbit
             };
         }
 
-        public void PublishMessage(string queueName, string message)
+        public void PublishMessage(string queueName, string message, DateTime date)
         {
+            _logger.LogInformation("Prepare publish");
+            
             using IConnection connection = _connectionFactory.CreateConnection();
+            _logger.LogInformation("Create connection");
+            
             using IModel channel = connection.CreateModel();
+            _logger.LogInformation("Create channel");
             
             channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            _logger.LogInformation("Declare queue with name \"{QueueName}\"", queueName);
             
             IBasicProperties properties = channel.CreateBasicProperties();
             properties.Persistent = true;
@@ -38,8 +44,7 @@ namespace Jour.Webhooks.Rabbit
             byte[] body = Encoding.UTF8.GetBytes(message);
     
             channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: body);
-
-            _logger.LogInformation("Message published to RabbitMQ: {JsonMessage}", message);
+            _logger.LogInformation("Message published to RabbitMQ: \"{JsonMessage}\"", message);
         }
     }
 }
