@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Text.Json;
 using Jour.Webhooks.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -40,8 +41,9 @@ namespace Jour.Webhooks.Rabbit
             
             IBasicProperties properties = channel.CreateBasicProperties();
             properties.Persistent = true;
-            
-            byte[] body = Encoding.UTF8.GetBytes(message);
+
+            string json = JsonSerializer.Serialize(new WorkoutMessage(message, date.ToString("O")));
+            byte[] body = Encoding.UTF8.GetBytes(json);
     
             channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: body);
             _logger.LogInformation("Message published to RabbitMQ: \"{JsonMessage}\"", message);
