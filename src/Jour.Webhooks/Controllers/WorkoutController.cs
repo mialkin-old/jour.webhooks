@@ -30,8 +30,7 @@ namespace Jour.Webhooks.Controllers
             }
 
             Message message = update.Message;
-            string jsonMessage = JsonSerializer.Serialize(message);
-            _logger.LogInformation("Message received from Telegram server: {JsonMessage}", jsonMessage);
+            _logger.LogInformation("Message received from Telegram server");
 
             switch (message.Type)
             {
