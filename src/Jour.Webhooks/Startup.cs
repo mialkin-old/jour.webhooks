@@ -43,7 +43,6 @@ namespace Jour.Webhooks
             services.AddOptions<RabbitOptions>().Bind(Configuration.GetSection(RabbitOptions.Rabbit))
                 .ValidateDataAnnotations();
 
-
             services.AddSingleton<ConnectionFactory>();
             services.AddSingleton<IMessageBroker, RabbitMessageBroker>();
         }
