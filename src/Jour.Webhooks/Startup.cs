@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 
 namespace Jour.Webhooks
 {
@@ -37,13 +38,14 @@ namespace Jour.Webhooks
 
             TelegramEndpoints endpoints = TelegramHelper.GetTelegramEndpoints(services, telegramEndpoints);
             services.AddSingleton(endpoints);
-
             services.AddSingleton<TelegramTransformer>();
 
             services.AddOptions<RabbitOptions>().Bind(Configuration.GetSection(RabbitOptions.Rabbit))
                 .ValidateDataAnnotations();
-            
-            services.AddTransient<IMessageBroker, RabbitMessageBroker>();
+
+
+            services.AddSingleton<ConnectionFactory>();
+            services.AddSingleton<IMessageBroker, RabbitMessageBroker>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

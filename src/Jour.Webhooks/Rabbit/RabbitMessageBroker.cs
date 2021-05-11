@@ -11,41 +11,44 @@ namespace Jour.Webhooks.Rabbit
     public class RabbitMessageBroker : IMessageBroker
     {
         private readonly ILogger<RabbitMessageBroker> _logger;
-        private readonly IConnectionFactory _connectionFactory;
-        
-        public RabbitMessageBroker(IOptions<RabbitOptions> rabbitOptions, ILogger<RabbitMessageBroker> logger)
+        private readonly IModel _channel;
+
+        public RabbitMessageBroker(ConnectionFactory connectionFactory, IOptions<RabbitOptions> rabbitOptions,
+            ILogger<RabbitMessageBroker> logger)
         {
             _logger = logger;
             RabbitOptions options = rabbitOptions.Value;
 
-            _connectionFactory = new ConnectionFactory()
-            {
-                HostName = options.Hostname,
-                UserName = options.Username,
-                Password = options.Password
-            };
+            connectionFactory.HostName = options.Hostname;
+            connectionFactory.UserName = options.Username;
+            connectionFactory.Password = options.Password;
+
+            _logger.LogInformation("Creating connection");
+            IConnection connection = connectionFactory.CreateConnection();
+            connection.ConnectionShutdown += (sender, args) => _logger.LogInformation("Connection shutdown");
+
+            _logger.LogInformation("Creating channel");
+            _channel = connection.CreateModel();
+
+            _channel.ModelShutdown += (sender, args) => _logger.LogInformation("Model shutdown");
         }
 
         public void PublishMessage(string queueName, string message, DateTime date)
         {
-            _logger.LogInformation("Prepare publish");
-            
-            using IConnection connection = _connectionFactory.CreateConnection();
-            _logger.LogInformation("Create connection");
-            
-            using IModel channel = connection.CreateModel();
-            _logger.LogInformation("Create channel");
-            
-            channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            _logger.LogInformation("Declare queue with name \"{QueueName}\"", queueName);
-            
-            IBasicProperties properties = channel.CreateBasicProperties();
+            _logger.LogInformation("Preparing to publish message.\nDeclaring queue with name \"{QueueName}\"",
+                queueName);
+            _channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false,
+                arguments: null);
+
+            IBasicProperties properties = _channel.CreateBasicProperties();
             properties.Persistent = true;
 
             string json = JsonSerializer.Serialize(new WorkoutMessage(message, date.ToString("O")));
             byte[] body = Encoding.UTF8.GetBytes(json);
-    
-            channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: body);
+
+            _logger.LogInformation("Publishing message");
+            _channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: properties, body: body);
+
             _logger.LogInformation("Message published to RabbitMQ: \"{JsonMessage}\"", message);
         }
     }
